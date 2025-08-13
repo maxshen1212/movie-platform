@@ -6,6 +6,7 @@ import { useDebounce } from "react-use";
 import MovieCard from "./components/MovieCard";
 import { getTrendingMovies, updateSearchCount } from "./appwrite.js";
 
+// API configuration
 const API_BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const API_OPPTIONS = {
@@ -16,7 +17,12 @@ const API_OPPTIONS = {
   },
 };
 
+//主應用元件
 const App = () => {
+  //狀態管理
+  // 使用 useState 管理關鍵字、電影列表、錯誤訊息、載入狀態和熱門電影列表。
+  // 使用 useDebounce 來避免過多的 API 調用。
+  // 當關鍵字改變時，會觸發useDebounce的搜尋詞更新，並根據關鍵字或熱門電影來獲取電影列表。
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -26,10 +32,10 @@ const App = () => {
 
   const [trendingMovies, setTrendingMovies] = useState([]);
 
-  // Debounce the search term to avoid too many API calls.
+  // 使用 useDebounce 來延遲搜尋詞的更新，避免過多的 API 調用。
   useDebounce(() => setDebouncedSearchTerm(searchTerm), 400, [searchTerm]);
 
-  // Function to fetch movies based on the search term or default to popular movies.
+  // 獲取電影列表的方法
   const fetchMovies = async (query = "") => {
     setIsLoading(true);
     try {
@@ -62,6 +68,7 @@ const App = () => {
     }
   };
 
+  // 獲取熱門電影列表的方法
   const fetchTrendingMovies = async () => {
     try {
       const movies = await getTrendingMovies();
@@ -71,14 +78,16 @@ const App = () => {
     }
   };
 
-  // Fetch movies when the component mounts or when the debounced search term changes.
+  // 1. 當組件mount時，會獲取電影列表。
+  // 2. 當搜尋詞改變時，會獲取電影列表。
   useEffect(() => {
     fetchMovies(debouncedSearchTerm);
   }, [debouncedSearchTerm]);
 
+  // 當組件mount時，會獲取熱門電影列表。
   useEffect(() => {
     fetchTrendingMovies();
-  }, []);
+  }, [debouncedSearchTerm]);
 
   return (
     <main>
@@ -90,8 +99,10 @@ const App = () => {
             Find <span className="text-gradient">Movies</span> You'll Enjoy
             Without The Hassle
           </h1>
+          {/* 搜尋元件 */}
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
+        {/* 條件渲染熱門電影 */}
         {trendingMovies.length > 0 && (
           <section className="trending">
             <h2>Trending Movies</h2>
@@ -110,7 +121,7 @@ const App = () => {
         )}
         <section className="all-movies">
           <h2 className="mb-[20px]">All Movies</h2>
-
+          {/* 條件渲染載入圈圈、錯誤訊息和電影列表元件 */}
           {isLoading ? (
             <Spinner />
           ) : errorMessage ? (

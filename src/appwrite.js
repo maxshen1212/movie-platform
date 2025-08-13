@@ -1,15 +1,19 @@
 import { Client, Databases, Query, ID } from "appwrite";
 
+// 載入環境變數
 const PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID;
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_ID;
 
+// 初始化 Appwrite 客戶端
 const client = new Client()
   .setEndpoint(import.meta.env.VITE_APPWRITE_ENDPOINT)
   .setProject(PROJECT_ID);
 
+// 初始化 Appwrite 資料庫
 const database = new Databases(client);
 
+// 更新搜尋次數
 export const updateSearchCount = async (searchTerm, movie) => {
   try {
     // 1. Use Appwrite's SDK to check if the search term exists in the database
@@ -38,6 +42,7 @@ export const updateSearchCount = async (searchTerm, movie) => {
   }
 };
 
+// 獲取最熱門電影
 export const getTrendingMovies = async () => {
   try {
     const results = await database.listDocuments(DATABASE_ID, COLLECTION_ID, [
